@@ -4,8 +4,10 @@ import 'package:slash_task/ReusableWidgets/ImageSlider.dart';
 import 'package:slash_task/Bloc/ProductsBloc.dart';
 import 'package:slash_task/ReusableWidgets/CustomAppBar.dart';
 import 'package:slash_task/ReusableWidgets/ProductDescriptionDropDown.dart';
+import 'package:slash_task/ReusableWidgets/ProductDetailsWidget.dart';
 import 'package:slash_task/ReusableWidgets/ProductInfoViewer.dart';
 import 'package:slash_task/ReusableWidgets/ProductOptionsNavigator.dart';
+import 'package:slash_task/Screens/LandingPage.dart';
 
 import '../Bloc/DataStructures.dart';
 import '../Bloc/States.dart';
@@ -29,30 +31,15 @@ class ProductDetails extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state is OpenedProductFetched) {
               print('found product: ${state.product}');
-              return Column(
-                children: [
-                  ImageSlider(
-                      images: state.product.productDetailsObject!.images),
-                  ProductInfoViewer(
-                      name: state.product.name,
-                      price: convertToString(
-                          state.product.productDetailsObject?.price),
-                      brandLogo:
-                          state.product.productDetailsObject!.brandLogoUrl,
-                      brandName: state.product.productDetailsObject!.brandName),
-                  // ProductsOptionsNavigator(options: options),
-                  Text('Product name: ${state.product.name}'),
-                  ProductDescriptionDropDown(
-                      description:
-                          state.product.productDetailsObject!.description)
-                ],
-              );
+              return ProductDetailsWidget(product: state.product);
+            } else if (state is VariationChanged) {
+              return ProductDetailsWidget(product: state.product);
             } else if (state is ProductsError) {
               return CustomErrorWidget(errMsg: state.errorMessage);
             }
 
             // Return a default widget if the state is not recognized
-            return Text('m7slsh 7aga ya alb akhook');
+            return Text('Default');
           },
         ));
   }

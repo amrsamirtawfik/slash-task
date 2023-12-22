@@ -26,3 +26,8 @@ class ProductNotFoundError extends ProductsState { //this is emitted when trying
 
   ProductNotFoundError({required this.errorMessage});
 }
+class VariationChanged extends ProductsState { //this is emitted when trying to open a product from the landing page and not found
+  final Product product;
+
+  VariationChanged({required this.product});
+}

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:slash_task/Bloc/DataStructures.dart';
+import 'package:slash_task/Bloc/ProductsBloc.dart';
 
 class ProductsOptionsNavigator extends StatefulWidget {
   final NavigationObject navigationObject;
+  String currentVariationId;
+  final String product_id;
 
-  ProductsOptionsNavigator({required this.navigationObject});
+  ProductsOptionsNavigator(
+      {super.key,
+      required this.navigationObject,
+      required this.currentVariationId,
+      required this.product_id});
 
   @override
   _ProductsOptionsNavigatorState createState() =>
@@ -12,26 +19,22 @@ class ProductsOptionsNavigator extends StatefulWidget {
 }
 
 class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
-  late List<Map<String,dynamic>> options;
+  late List<dynamic> options;
   late Map<String, String> selectedValues;
+
   @override
-
   initState() {
-    options=widget.navigationObject.availableProps;
-    selectedValues=widget.navigationObject.selectedOptions;
-    print("initState Called");
+    options = widget.navigationObject.availableProps;
+    selectedValues = widget.navigationObject.selectedOptions;
 
-    print('Selected values: $selectedValues\nOptions: $options');
   }
-
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: options.map((property) {
         String propertyName = property['property'];
-        List<Map<String, dynamic>> propertyValues = property['values'];
+        List<dynamic> propertyValues = property['values'];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,22 +45,25 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
               spacing: 8.0,
               runSpacing: 8.0,
               children: propertyValues.map((value) {
-                int index = propertyValues.indexOf(value);
 
                 return ElevatedButton(
                   onPressed: () {
 
                     setState(() {
                       selectedValues[property['property'] as String] =
-                      value['value'] as String;
-                      print(selectedValues);
+                          value['value'] as String;
+                      ProductsBloc.get(context).searchVariation(
+                          widget.currentVariationId,
+                          selectedValues,
+                          widget.product_id);
+                      //print(selectedValues);
                     });
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                          (Set<MaterialState> states) {
+                      (Set<MaterialState> states) {
                         return selectedValues[property['property'] as String] ==
-                            value['value']
+                                value['value']
                             ? Colors.blue // Highlighted color
                             : null;
                       },

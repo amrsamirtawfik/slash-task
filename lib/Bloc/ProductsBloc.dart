@@ -20,7 +20,7 @@ class ProductsBloc extends Cubit<ProductsState> {
 
   Future<Map<String, dynamic>> fetchUrl(apiUrl) async {
     final response = await http.get(Uri.parse(apiUrl));
-    print('ApiUrl: $apiUrl response: $response');
+
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the data
 
@@ -75,7 +75,7 @@ class ProductsBloc extends Cubit<ProductsState> {
     }
   }
 
-  void fetch_opened_product(String productID) async {
+  int searchIndex(productID) {
     int foundProductIndex = -1;
     for (int i = 0; i < products.length; i++) {
       if (products[i].id == productID) {
@@ -83,6 +83,11 @@ class ProductsBloc extends Cubit<ProductsState> {
         break;
       }
     }
+    return foundProductIndex;
+  }
+
+  void fetch_opened_product(String productID) async {
+    int foundProductIndex = searchIndex(productID);
 
     if (foundProductIndex == -1) {
       emit(ProductNotFoundError(
@@ -90,89 +95,141 @@ class ProductsBloc extends Cubit<ProductsState> {
     } else if (products[foundProductIndex].productDetailsObject ==
             null //not fetched before->Fetch and set it then emit
         ) {
+      emit(ProductsLoading());
+      Map<String, dynamic> response =
+          await fetchUrl('$mainProductsApiUrl/$productID');
       try {
-        emit(ProductsLoading());
-        Map<String, dynamic> response =
-            await fetchUrl('$mainProductsApiUrl/$productID');
+        //parse the response, store it in the stored product in the main menu
+        List<Variation> tempVariations = [];
+        String variation_id = '-1';
+        List<String> images = [];
+        String name = response['data']['name'];
+        double price = -1;
+        String brandLogoUrl = response['data']['brandImage'];
+        String brandName = response['data']['brandName'];
 
+        Map<String, String> selectedOptions = {};
+        String description = response['data']['description'];
+        bool in_stock = true;
+        List<dynamic> availableProps = response['data']['avaiableProperties'];
 
-          //parse the response, store it in the stored product in the main menu
-          List<Variation> tempVariations = [];
-          String variation_id = '-1';
-          List<String> images = [];
-          String name = response['data']['name'];
-          double price = -1;
-          String brandLogoUrl = response['data']['brandImage'];
-          String brandName = response['data']['brandName'];
+        List<Map<String, dynamic>> uniqueProps = [];
+        Set<String> uniquePropertySet = Set();
 
-          Map<String, String> selectedOptions = {};
-          String description = response['data']['description'];
-          bool in_stock = true;
-          List<Map<String, dynamic>> availableProps =
-              response['avaiableProperties'];
+        for (var prop in availableProps) {
+          if (uniquePropertySet.add(prop['property'])) {
+            uniqueProps.add(prop);
+          }
+        }
 
-          List<Map<String, dynamic>> uniqueProps = [];
-          Set<String> uniquePropertySet = Set();
-
-          for (var prop in availableProps) {
-            if (uniquePropertySet.add(prop['property'])) {
-              uniqueProps.add(prop);
+        for (var variation in response['data']['variations']) {
+          if (variation['isDefault']) {
+            variation_id = convertToString(variation['id']);
+            price = convertToDouble(variation['price']);
+            in_stock = variation['inStock'];
+            images.clear();
+            for (var image in variation['ProductVarientImages']) {
+              images.add(image['image_path']);
+            }
+            for (var keyValue in variation['productPropertiesValues']) {
+              selectedOptions[keyValue['property']] = keyValue['value'];
             }
           }
-          List<Variation> variations = [];
-          for (var variation in response['data']['variations']) {
-            if (variation['isDefault']) {
-              variation_id = variation['id'];
-              price = variation['price'];
-              in_stock = variation['inStock'];
-              images.clear();
-              for (var image in variation['ProductVarientImages']) {
-                images.add(image['image_path']);
-              }
-              for (var keyValue in variation['productPropertiesValues']) {
-                selectedOptions[keyValue['property']] = keyValue['value'];
-              }
-            }
-            Variation tempVariation = Variation(
-                id: variation['id'],
-                price: variation['price'],
-                quantity: variation['quantity'],
-                inStock: variation['inStock'],
-                productVariantImages: variation['ProductVarientImages']
-                    .map((e) => e['image_path'].toString())
-                    .toList(),
-                productPropertiesValues: variation['productPropertiesValues'],
-                productStatus: variation['productStatus'],
-                isDefault: variation['isDefault'],
-                productVariationStatusId:
-                    variation['product_variation_status_id']);
-            tempVariations.add(tempVariation);
-          }
-          NavigationObject navigationObject = NavigationObject(
-              availableProps: uniqueProps, selectedOptions: selectedOptions);
-          products[foundProductIndex].productDetailsObject =
-              ProductDetailsObject(
-                  variation_id: variation_id,
-                  images: images,
-                  name: name,
-                  price: price,
-                  brandLogoUrl: brandLogoUrl,
-                  brandName: brandName,
-                  navigationObject: navigationObject,
-                  description: description,
-                  in_stock: in_stock,
-                  variations: variations);
-          emit(OpenedProductFetched(products[foundProductIndex]));
+          List<String> imagePathList =
+              (variation['ProductVarientImages'] as List<dynamic>)
+                  .map((imageMap) => imageMap['image_path'].toString())
+                  .toList();
 
+          Variation tempVariation = Variation(
+              id: variation['id'],
+              price: convertToDouble(variation['price']),
+              quantity: convertToInt(variation['quantity']),
+              inStock: variation['inStock'],
+              productVariantImages: imagePathList,
+              productPropertiesValues: variation['productPropertiesValues'],
+              productStatus: variation['productStatus'],
+              isDefault: variation['isDefault'],
+              productVariationStatusId:
+                  variation['product_variation_status_id']);
+          tempVariations.add(tempVariation);
+        }
+        NavigationObject navigationObject = NavigationObject(
+            availableProps: uniqueProps, selectedOptions: selectedOptions);
+        products[foundProductIndex].productDetailsObject = ProductDetailsObject(
+            variation_id: variation_id,
+            images: images,
+            name: name,
+            price: price,
+            brandLogoUrl: brandLogoUrl,
+            brandName: brandName,
+            navigationObject: navigationObject,
+            description: description,
+            in_stock: in_stock,
+            variations: tempVariations);
 
+        emit(OpenedProductFetched(products[foundProductIndex]));
       } catch (e) {
+        print(e);
         emit(ProductsError(
-            errorMessage: 'Some error happened!\nPlease try agian later.'));
+            errorMessage: 'Some error happened!\nPlease try again.'));
       }
     } else {
       //fetched before ->emit it
+
       emit(OpenedProductFetched(products[foundProductIndex]));
     }
+  }
+
+  void handleOptionButton(String currentVariationId,
+      Map<String, String> selectedOptions, String productId) {}
+
+  void changeVariation(Product product, Variation newVariation) {
+    product.productDetailsObject?.price = newVariation.price;
+    product.productDetailsObject?.variation_id =
+        convertToString(newVariation.id);
+    product.productDetailsObject?.images = newVariation.productVariantImages;
+  }
+
+  void searchVariation(String currentVariationId,
+      Map<String, String> selectedOptions, String productId) {
+    print(
+        'search variation is called\nselectedOptions: ${selectedOptions}\ncurrent: $currentVariationId');
+
+    int foundProductIndex = searchIndex(productId);
+
+    if (foundProductIndex != -1) {
+      Product product = products[foundProductIndex];
+
+      // Find the variation that matches the selected options
+      Variation? selectedVariation;
+
+      for (Variation variation
+          in product.productDetailsObject?.variations ?? []) {
+        Map<String, String> variationOptions = {};
+
+        for (Map<String, dynamic> propertyValue
+            in variation.productPropertiesValues) {
+          variationOptions[propertyValue['property']] = propertyValue['value'];
+        }
+
+        if (selectedOptions.entries.every((entry) =>
+            variationOptions.containsKey(entry.key) &&
+            variationOptions[entry.key] == entry.value)) {
+          selectedVariation = variation;
+          print('found variation : $selectedVariation');
+
+          if (currentVariationId != selectedVariation.id.toString()) {
+            changeVariation(products[foundProductIndex], selectedVariation);
+            emit(VariationChanged(product: products[foundProductIndex]));
+            return;
+          }
+          return;
+        }
+      }
+
+      // Check if the selected variation is different from the current one
+    }
+    return;
   }
 }
 

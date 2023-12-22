@@ -44,7 +44,8 @@ class LandingPage extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const ProductDetails()),
+                                      builder: (context) =>
+                                          const ProductDetails()),
                                 );
                               },
                             ))
@@ -55,7 +56,31 @@ class LandingPage extends StatelessWidget {
                 return CustomErrorWidget(errMsg: state.errorMessage);
               }
 
-              return Container(); // Default case
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: CustomGrid(
+                  children: ProductsBloc.get(context)
+                      .products
+                      .map((product) => LandingPageProductCard(
+                            product_id: product.id,
+                            productName: product.name,
+                            productPrice: convertToString(product.mainPrice),
+                            brandLogo: product.brandLogoUrl,
+                            productImageUrl: product.mainImage,
+                            onTap: () {
+                              ProductsBloc.get(context)
+                                  .fetch_opened_product(product.id);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ProductDetails()),
+                              );
+                            },
+                          ))
+                      .toList(),
+                ),
+              ); // Default case
             }));
   }
 }

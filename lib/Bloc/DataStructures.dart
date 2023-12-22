@@ -1,14 +1,14 @@
-
 import 'package:bloc/bloc.dart';
 
-///data structures
+/// Data structures
 class Product {
-  final String id;
-  final String name;
-  final double mainPrice;
-  final String mainImage;
-  final String brandLogoUrl;
-  ProductDetailsObject? productDetailsObject;
+  String id;
+  String name;
+  double mainPrice; //the price shown in the landing page, NOT SHOWN IN THE PRODUCT DETAILS
+  String mainImage;
+  String brandLogoUrl;
+  ProductDetailsObject?
+      productDetailsObject; //this object will be the object that the products screen will read from, if it's changed then the products screen components will be changed
 
   Product({
     required this.id,
@@ -35,19 +35,19 @@ class Product {
 }
 
 class ProductDetailsObject {
-  final String variation_id;
-  final List<String> images;
-  final String name;
-  final double price;
-  final String brandLogoUrl;
-  final String brandName;
-  final NavigationObject navigationObject;
-  final String description;
-  final bool in_stock;
-  final List<Variation> variations;
+  String variation_id;
+  List<String> images;
+  String name;
+  double price;
+  String brandLogoUrl;
+  String brandName;
+  NavigationObject navigationObject;
+  String description;
+  bool in_stock;
+  List<Variation> variations;
 
   ProductDetailsObject({
-    required this.variation_id, //the id of the shown variation
+    required this.variation_id, // the id of the shown variation
     required this.images,
     required this.name,
     required this.price,
@@ -58,14 +58,40 @@ class ProductDetailsObject {
     required this.in_stock,
     required this.variations,
   });
+
+  @override
+  String toString() {
+    return '''
+  ProductDetailsObject:
+    Variation ID: $variation_id
+    Name: $name
+    Price: $price
+    Brand Name: $brandName
+    Navigation Object: $navigationObject
+    Description: $description
+    In Stock: $in_stock
+    Variations: ${variations.map((element) => element.toString()).join('\n')}
+  ''';
+  }
 }
 
 class NavigationObject {
-  final List<Map<String,dynamic>> availableProps;
+  final List<Map<String, dynamic>> availableProps;
   Map<String, String> selectedOptions;
 
-  NavigationObject(
-      {required this.availableProps, required this.selectedOptions});
+  NavigationObject({
+    required this.availableProps,
+    required this.selectedOptions,
+  });
+
+  @override
+  String toString() {
+    return '''
+    NavigationObject:
+      Available Properties: $availableProps
+      Selected Options: $selectedOptions
+    ''';
+  }
 }
 
 class Variation {
@@ -74,7 +100,7 @@ class Variation {
   final int quantity;
   final bool inStock;
   final List<String> productVariantImages;
-  final List<Map<String,dynamic>> productPropertiesValues;
+  final List<dynamic> productPropertiesValues;
   final String productStatus;
   final bool isDefault;
   final int productVariationStatusId;
@@ -90,19 +116,22 @@ class Variation {
     required this.isDefault,
     required this.productVariationStatusId,
   });
+
+  @override
+  String toString() {
+    return '''
+    Variation:
+      ID: $id
+      Price: $price
+      Quantity: $quantity
+      In Stock: $inStock
+      Product Properties Values: $productPropertiesValues
+      Product Status: $productStatus
+      Is Default: $isDefault
+      Product Variation Status ID: $productVariationStatusId
+    ''';
+  }
 }
-
-
-
-// class ProductPropertyValue {
-//   final String value;
-//   final String property;
-//
-//   ProductPropertyValue({
-//     required this.value,
-//     required this.property,
-//   });
-// }
 
 class MyBlocObserver extends BlocObserver {
   @override

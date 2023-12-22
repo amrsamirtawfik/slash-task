@@ -51,7 +51,7 @@ class ProductInfoViewer extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               Text(
-                'Brand',
+                brandName,
                 style: TextStyle(
                   fontSize: 14.0,
                   color: Colors.grey,
