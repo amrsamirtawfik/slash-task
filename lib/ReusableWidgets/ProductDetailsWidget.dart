@@ -34,10 +34,7 @@ class _ProductDetailsWidgetState extends State<ProductDetailsWidget> {
           currentVariationId: widget.product.productDetailsObject!.variation_id,
           product_id: widget.product.id,
         ),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Text('Product name: ${widget.product.id}'),
-        ),
+
         Padding(
           padding: const EdgeInsets.all(20.0),
           child: ProductDescriptionDropDown(

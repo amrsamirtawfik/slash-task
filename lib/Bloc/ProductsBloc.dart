@@ -169,7 +169,7 @@ class ProductsBloc extends Cubit<ProductsState> {
 
         emit(OpenedProductFetched(products[foundProductIndex]));
       } catch (e) {
-        print(e);
+        //print(e);
         emit(ProductsError(
             errorMessage: 'Some error happened!\nPlease try again.'));
       }
@@ -192,8 +192,8 @@ class ProductsBloc extends Cubit<ProductsState> {
 
   void searchVariation(String currentVariationId,
       Map<String, String> selectedOptions, String productId) {
-    print(
-        'search variation is called\nselectedOptions: ${selectedOptions}\ncurrent: $currentVariationId');
+   // print(
+      //  'search variation is called\nselectedOptions: ${selectedOptions}\ncurrent: $currentVariationId');
 
     int foundProductIndex = searchIndex(productId);
 
@@ -216,7 +216,7 @@ class ProductsBloc extends Cubit<ProductsState> {
             variationOptions.containsKey(entry.key) &&
             variationOptions[entry.key] == capitalizeFirstLetter(entry.value))) {
           selectedVariation = variation;
-          print('found variation : $selectedVariation');
+          //print('found variation : $selectedVariation');
 
           if (currentVariationId != selectedVariation.id.toString()) {
             changeVariation(products[foundProductIndex], selectedVariation);

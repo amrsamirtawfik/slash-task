@@ -26,7 +26,7 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
   initState() {
     options = (widget.navigationObject.availableProps);
     selectedValues = widget.navigationObject.selectedOptions;
-    print('opppp: $options');
+   // print('opppp: $options');
   }
 
   @override
@@ -42,7 +42,7 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
             uniqueValues.add(capitalizeFirstLetter(propertyValue['value']));
           }
         }
-        print('unique: $uniqueValues');
+      //  print('unique: $uniqueValues');
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,

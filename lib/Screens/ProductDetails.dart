@@ -25,12 +25,12 @@ class ProductDetails extends StatelessWidget {
         body: BlocConsumer<ProductsBloc, ProductsState>(
           listener: (context, state) {},
           builder: (context, state) {
-            print(state);
+            //print(state);
             // Builder is used to rebuild the UI based on the current state
             if (state is ProductsLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is OpenedProductFetched) {
-              print('found product: ${state.product}');
+            //  print('found product: ${state.product}');
               return ProductDetailsWidget(product: state.product);
             } else if (state is VariationChanged) {
               return ProductDetailsWidget(product: state.product);
