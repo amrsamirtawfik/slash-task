@@ -1,16 +1,14 @@
-# slash_task
+# A simple e-commerce project done for a real company
 
-A new Flutter project.
+# Screen recording
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+https://github.com/amrsamirtawfik/slash-task/assets/85262211/8ad9a612-ad4c-496e-82d9-436ed13d3b62
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+# Screen shots
+![Screenshot_20231222_113730](https://github.com/amrsamirtawfik/slash-task/assets/85262211/97306b51-8760-4734-b3fe-75da85dde217)
+![Screenshot_20231222_113654](https://github.com/amrsamirtawfik/slash-task/assets/85262211/f65b6534-f9eb-4f32-aee2-2f89f2b4b212)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Used Technologies
+Flutter, Bloc, Http , Animators
