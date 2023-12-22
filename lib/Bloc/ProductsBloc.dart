@@ -209,12 +209,12 @@ class ProductsBloc extends Cubit<ProductsState> {
 
         for (Map<String, dynamic> propertyValue
             in variation.productPropertiesValues) {
-          variationOptions[propertyValue['property']] = propertyValue['value'];
+          variationOptions[propertyValue['property']] = capitalizeFirstLetter(propertyValue['value']);
         }
 
         if (selectedOptions.entries.every((entry) =>
             variationOptions.containsKey(entry.key) &&
-            variationOptions[entry.key] == entry.value)) {
+            variationOptions[entry.key] == capitalizeFirstLetter(entry.value))) {
           selectedVariation = variation;
           print('found variation : $selectedVariation');
 
@@ -268,4 +268,44 @@ String convertToString(dynamic value) {
     throw ArgumentError(
         "Invalid argument type, expected double, int, or String.");
   }
+}
+
+String capitalizeFirstLetter(String input) {
+  if (input.isEmpty) return input;
+  return input[0].toUpperCase() + input.substring(1);
+}
+
+String removeFirstIfNotHex(String input) {
+  if (input.isNotEmpty && RegExp(r'^[0-9a-fA-F]+$').hasMatch(input[0])) {
+    return input;
+  }
+  return input.substring(1);
+}
+
+bool isValidHex(String hex) {
+  final RegExp hexColorRegex = RegExp(r'^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$');
+  return hexColorRegex.hasMatch(removeFirstIfNotHex(hex));
+}
+
+List<dynamic?> getUniqueList(List<dynamic?> inputList) {
+  Set<dynamic?> uniqueSet = Set<dynamic?>.from(inputList);
+  List<dynamic?> uniqueList = List<dynamic?>.from(uniqueSet);
+  return uniqueList;
+}
+
+List<dynamic> getUniqueListByPropertyValue(
+    List<dynamic> inputList, String propertyName) {
+  Map<dynamic, dynamic> uniqueMap = {};
+  propertyName = capitalizeFirstLetter(propertyName);
+  inputList.forEach((element) {
+    if (element is Map<String, dynamic>) {
+      var propertyValue = element[propertyName];
+      if (!uniqueMap.containsKey(propertyValue)) {
+        uniqueMap[propertyValue] = element;
+      }
+    }
+  });
+
+  List<dynamic> uniqueList = uniqueMap.values.toList();
+  return uniqueList;
 }

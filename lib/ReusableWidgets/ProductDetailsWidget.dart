@@ -34,10 +34,25 @@ class _ProductDetailsWidgetState extends State<ProductDetailsWidget> {
           currentVariationId: widget.product.productDetailsObject!.variation_id,
           product_id: widget.product.id,
         ),
-        Text('Product name: ${widget.product.id}'),
-        ProductDescriptionDropDown(
-          description: widget.product.productDetailsObject!.description,
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text('Product name: ${widget.product.id}'),
         ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: ProductDescriptionDropDown(
+            description: widget.product.productDetailsObject!.description,
+          ),
+        ),
+        Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ElevatedButton(
+                onPressed:
+                    widget.product.productDetailsObject!.in_stock ? (){} : null,
+                child: Text(
+                  'Add to cart',
+                  style: TextStyle(fontFamily: 'Cairo-Medium', fontSize: 20),
+                )))
       ],
     );
   }

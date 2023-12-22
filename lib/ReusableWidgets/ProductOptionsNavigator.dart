@@ -24,9 +24,9 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
 
   @override
   initState() {
-    options = widget.navigationObject.availableProps;
+    options = (widget.navigationObject.availableProps);
     selectedValues = widget.navigationObject.selectedOptions;
-
+    print('opppp: $options');
   }
 
   @override
@@ -35,23 +35,29 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
       children: options.map((property) {
         String propertyName = property['property'];
         List<dynamic> propertyValues = property['values'];
-
+        List<String> uniqueValues = [];
+        for (var propertyValue in propertyValues) {
+          if (!uniqueValues
+              .contains(capitalizeFirstLetter(propertyValue['value']))) {
+            uniqueValues.add(capitalizeFirstLetter(propertyValue['value']));
+          }
+        }
+        print('unique: $uniqueValues');
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text('Choose $propertyName:',
                 style: TextStyle(fontFamily: 'Cairo-Bold', fontSize: 20)),
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
-              children: propertyValues.map((value) {
-
+              children: uniqueValues.map((value) {
                 return ElevatedButton(
                   onPressed: () {
-
                     setState(() {
                       selectedValues[property['property'] as String] =
-                          value['value'] as String;
+                          value;
                       ProductsBloc.get(context).searchVariation(
                           widget.currentVariationId,
                           selectedValues,
@@ -63,14 +69,14 @@ class _ProductsOptionsNavigatorState extends State<ProductsOptionsNavigator> {
                     backgroundColor: MaterialStateProperty.resolveWith<Color?>(
                       (Set<MaterialState> states) {
                         return selectedValues[property['property'] as String] ==
-                                value['value']
+                                value
                             ? Colors.blue // Highlighted color
                             : null;
                       },
                     ),
                   ),
                   child: Text(
-                    value['value'],
+                    capitalizeFirstLetter(value),
                     style: TextStyle(fontFamily: 'Cairo-medium', fontSize: 16),
                   ),
                 );
